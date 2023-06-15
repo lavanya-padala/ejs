@@ -1,6 +1,5 @@
 const express = require('express');
 const multer=require("multer")
-const { protectUser } = require('../../middlewares/authMiddleware');
 const{ 
     register,
     login,

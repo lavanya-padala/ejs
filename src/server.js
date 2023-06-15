@@ -6,7 +6,6 @@ const cors = require('cors');
 const { connectDB } = require('./config/db');
 
 const userRoutesV1 = require('./routes/v1/user.route');
-const watchesRoutesV1 = require('./routes/v1/watches.route');
 
 const rateLimit =  require('express-rate-limit');
 
@@ -17,7 +16,6 @@ const limiter = rateLimit({
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
 
-const { notFoundError, errorHandler } = require('./middlewares/errorHandlerMiddleware');
 const app = express();
 
 dotenv.config();
@@ -36,10 +34,6 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/v1/users/', userRoutesV1);
-app.use('/api/v1/watches/', watchesRoutesV1); 
-
-app.use(notFoundError);
-app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
