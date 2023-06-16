@@ -1,9 +1,9 @@
 const { Schema, model } = require('mongoose');
 
 const requestsSchema = new Schema({
-    watch:{
+    item:{
         type:Schema.Types.ObjectId,
-        ref:"WatchSpecification"
+        ref:"ItemSpecification"
     },
     requestBy:{
         type:Schema.Types.ObjectId,

@@ -1,7 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const userSchema=require("../models/user.model")
-const WatchSpecification=require("../models/watch_specification.model")
-const { generateToken } = require('../utils/generateToken');
+const ItemSpecification=require("../models/item_specification.model")
 const jwt=require("jsonwebtoken")
 const e = require('express');
 const dotenv=require('dotenv')
@@ -64,73 +63,32 @@ module.exports.login = asyncHandler(async (req, res) => {
       
 
 });
-module.exports.addwatch=asyncHandler(async(req,res)=>{
+module.exports.additem=asyncHandler(async(req,res)=>{
   try{
-    const{brand,model,reference_number,version_number,web_link,price,price_currency,model_case,oyster_architecture,diameter,material,bezel,winding_crown,crystal,water_resistance,movement,calibre,precision,functions,oscillator,winding,power_reserve,bracelet,bracelet_material,dial,details,certification}=req.body;
-    const newWatch= new WatchSpecification({
+    const{brand,model,price,details}=req.body;
+    const newItem= new ItemSpecification({
       brand,
       model,
-      reference_number,
-      version_number,
-      web_link,
       price,
-      price_currency,
-      model_case,
-      oyster_architecture,
-      diameter,
-      material,
-      bezel,
-      winding_crown,
-      crystal,
-      water_resistance,
-      movement,
-      calibre,
-      precision,
-      functions,
-      oscillator,
-      winding,
-      power_reserve,
-      bracelet,
-      bracelet_material,
-      dial,
       details,
-      certification,
       owner:req.user._id
     })
     if(req.files){
-    if(req.files["watch_main_pic"]){
-        newWatch.watch_main_pic=req.files["watch_main_pic"][0].filename
+    if(req.files["itemPic"]){
+        newItem.itemPic=req.files["itemPic"][0].filename
     }
-    if(req.files["model_case_pic"]){
-        newWatch.model_case_pic=req.files["model_case_pic"][0].filename
-    }
-    if(req.files["movement_pic"]){
-        newWatch.movement_pic=req.files["movement_pic"][0].filename
-    }
-    if(req.files["bracelet_pic"]){
-        newWatch.bracelet_pic=req.files["bracelet_pic"][0].filename
-    }
-    if(req.files["dial_pic"]){
-        newWatch.dial_pic=req.files["dial_pic"][0].filename
-    }
-    if(req.files["pdf_download_userguide"]){
-        newWatch.pdf_download_userguide=req.files["pdf_download_userguide"][0].filename
-    }
-    if(req.files["pdf_download_brochure"]){
-        newWatch.pdf_download_brochure=req.files["pdf_download_brochure"][0].filename
-    }
+
 }
-    await newWatch.save()
-    return res.status(201).json({ message: 'Watch added successfully' });
+    await newItem.save()
+    return res.status(201).json({ message: 'Item added successfully' });
   }
   catch(error){
     console.log(error)
     return res.status(500).json({ message: 'Internal server error' ,error:error});
-   
   }
 })
 //To search for a watch
-module.exports.watches = asyncHandler(async(req,res)=>{
+module.exports.items = asyncHandler(async(req,res)=>{
   try {
     const { brand, model } = req.query;
 
@@ -144,9 +102,9 @@ module.exports.watches = asyncHandler(async(req,res)=>{
     }
 
     // Find watches based on the search query
-    const watches = await WatchSpecification.find(searchQuery);
+    const items = await ItemSpecification.find(searchQuery);
 
-    res.status(200).json({ watches });
+    res.status(200).json({ items });
   } catch (error) {
     console.error('Error searching watches:', error);
     res.status(500).json({ message: 'Error occured' });
@@ -158,12 +116,12 @@ module.exports.rentrequest = asyncHandler(async(req,res)=>{
     const { id } = req.params;
 
     // Find the watch by ID
-    const watch = await WatchSpecification.findById(id);
-    if (!watch) {
+    const item = await ItemSpecification.findById(id);
+    if (!item) {
       return res.status(404).json({ message: 'Watch not found' });
     }
     const newRequest = new requestsSchema({
-        watch:id,
+        item:id,
         requestBy:req.user._id,
     })
     await newRequest.save()
@@ -176,13 +134,13 @@ module.exports.rentrequest = asyncHandler(async(req,res)=>{
 //Owner can view the all the pending request to the watches
 module.exports.requests = asyncHandler(async(req,res)=>{
 
-  await requestsSchema.find({isAccepted:false}).populate("watch")
+  await requestsSchema.find({isAccepted:false}).populate("item")
   .exec((err,requests)=>{
     if(err){
-      return res.send({message:"No new requests"})
+      return res.send({message:"Error occured"})
     }
     //console.log(requests)
-    const filteredrequests=requests.filter(request=>request.watch.owner==req.user._id)
+    const filteredrequests=requests.filter(request=>request.item.owner==req.user._id)
     res.status(500).json({filteredrequests})
   })
 })
@@ -190,7 +148,6 @@ module.exports.requests = asyncHandler(async(req,res)=>{
 module.exports.acceptrequest = asyncHandler(async(req,res)=>{
   try {
     const requestId = mongoose.Types.ObjectId(req.params.id);
-    console.log("requestId"+requestId)
     await requestsSchema.findByIdAndUpdate(requestId, { isAccepted: true });
     return res.status(200).json({ message: "Request Accepted Successfully" });
   } catch (error) {
@@ -200,7 +157,7 @@ module.exports.acceptrequest = asyncHandler(async(req,res)=>{
 //user can view the mobile number of owner for accepted requests
 module.exports.acceptedrequests=asyncHandler(async(req,res)=>{
   const data=await requestsSchema.find({isAccepted:true,requestBy:req.user._id}).populate({
-    path: "watch",
+    path: "item",
     populate: {
       path: "owner",
       select: "mobileNumber"
@@ -218,12 +175,12 @@ module.exports.acceptedrequests=asyncHandler(async(req,res)=>{
 
 module.exports.rentals=asyncHandler(async(req,res)=>{
   
-  await requestsSchema.find({isAccepted:true,status:false}).populate("watch")
+  await requestsSchema.find({isAccepted:true,status:false}).populate("item")
   .exec((err,requests)=>{
     if(err){
       return res.send({message:"No new requests"})
     }
-    const filteredrequests=requests.filter(request=>request.watch.owner==req.user._id)
+    const filteredrequests=requests.filter(request=>request.item.owner==req.user._id)
     res.status(201).json({filteredrequests})
   })
 })
@@ -236,7 +193,7 @@ module.exports.createRentalRecord=asyncHandler(async(req,res)=>{
     const proofImage=req.files["proofImage"][0].filename
     const requestId = mongoose.Types.ObjectId(req.params.id);
     await requestsSchema.updateMany({_id:requestId},{$set:{returnDate:returnDate,startDate:startDate,proofImage:proofImage}});
-    return res.status(200).json({ message: "Request Accepted Successfully" });
+    return res.status(200).json({ message: "Rental record created" });
   } catch (error) {
     console.log(error)
     return res.status(400).json({ message: "Error while accepting request", error:error });
@@ -246,12 +203,12 @@ module.exports.createRentalRecord=asyncHandler(async(req,res)=>{
 //owner can view pending rental records
 module.exports.pendingRentalRecords=asyncHandler(async(req,res)=>{
   try{
-    await requestsSchema.find({isAccepted:true,status:false}).populate("watch")
+    await requestsSchema.find({isAccepted:true,status:false}).populate("item")
   .exec((err,requests)=>{
     if(err){
       return res.send({message:"No new pending rental records"})
     }
-    const filteredrequests=requests.filter(request=>request.watch.owner==req.user._id & request.startDate!="")
+    const filteredrequests=requests.filter(request=>request.item.owner==req.user._id & request.startDate!="")
     res.status(201).json({filteredrequests})
   })
 }
@@ -265,9 +222,9 @@ module.exports.closeRentalRecord=asyncHandler(async(req,res)=>{
     const returnProofImage=req.files["returnProofImage"][0].filename
     const requestId = mongoose.Types.ObjectId(req.params.id);
     await requestsSchema.updateMany({_id:requestId},{$set:{status:true,returnProofImage:returnProofImage}});
-    return res.status(200).json({ message: "Watch return recorded successfully" });
+    return res.status(200).json({ message: "item return recorded successfully" });
   } catch (error) {
-    console.log(error)
-    return res.status(400).json({ message: "Error while accepting request", error:error });
+    console.log("error",error)
+    return res.status(400).json({ message: "Error occured", error:error });
   }
 })

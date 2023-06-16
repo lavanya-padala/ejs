@@ -3,8 +3,8 @@ const multer=require("multer")
 const{ 
     register,
     login,
-    addwatch,
-    watches,
+    additem,
+    items,
     rentrequest,
     requests,
     acceptrequest,
@@ -19,15 +19,9 @@ const router = express.Router();
 const {upload}=require("../../config/multerUpload")
 router.post('/login', login);
 router.post('/register', register);
-router.post("/addwatch",verifyuser,upload.fields([{ name: 'watch_main_pic', maxCount: 1 },
-{ name: 'model_case_pic', maxCount: 1 },
-{ name: 'movement_pic', maxCount: 1 },
-{ name: 'bracelet_pic', maxCount: 1 },
-{ name: 'dial_pic', maxCount: 1 },
-{ name: 'pdf_download_userguide', maxCount: 1 },
-{ name: 'pdf_download_brochure', maxCount: 1 }]),addwatch)
-router.post("/watches",verifyuser,watches)
-router.post("/watches/:id/rent",verifyuser,rentrequest)
+router.post("/additem",verifyuser,upload.fields([{ name: 'itemPic', maxCount: 1 }]),additem)
+router.post("/items",verifyuser,items)
+router.post("/items/:id/rent",verifyuser,rentrequest)
 router.post("/requests",verifyuser,requests)
 router.post("/requests/:id/accept",verifyuser,acceptrequest)
 router.post("/acceptedrequests",verifyuser,acceptedrequests)
