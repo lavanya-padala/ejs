@@ -44,7 +44,7 @@ router.get('/additem',(req, res) => {
     res.sendFile(path.join(__dirname,"..","..",'/views/closeRental.html'));
   });
 router.get("/items",(req,res)=>{
-  const apiUrl = 'http://localhost:5000/api/v1/users/items';
+  const apiUrl = `${process.env.BASE_URL}/api/v1/users/items`;
 const headers = {
   'Content-Type': 'application/json',
   'auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDkwMGUzZmY0OTQ4ZDIyMGMyYTliZWMiLCJpYXQiOjE2ODczMTA2NTJ9.YRHr8JbJTMgWa9ynel8gjxxPmDxCJguqEdoo2UujCqE',
