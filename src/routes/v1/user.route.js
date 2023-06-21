@@ -4,6 +4,8 @@ const path=require("path");
 const multer=require("multer");
 const dotenv = require('dotenv');
 dotenv.config();
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+
 
 const ejs=require("ejs")
 app.set("view engine","ejs")
