@@ -3,7 +3,7 @@ const dotenv=require('dotenv')
 
 dotenv.config()
 module.exports=async function(req,res,next){
-    const token=await req.header("auth-token");
+    const token=await req.header("auth-token")
     if(!token) return res.status(400).send("Access denied")
     try{
         const verified=jwt.verify(token,process.env.JWT_SECRET);

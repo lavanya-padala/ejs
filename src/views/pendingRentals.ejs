@@ -1,0 +1,26 @@
+<!-- pendingRequests.ejs -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pending Requests</title>
+</head>
+<body>
+  <h1>Pending Requests</h1>
+  <% if (filteredrequests && filteredrequests.length > 0) { %>
+    <% filteredrequests.forEach(request => { %>
+      <div>
+        <h2>Request ID: <%= request._id %></h2>
+        <h3>Item:</h3>
+        <p>Brand: <%= request.item.brand %></p>
+        <p>Model: <%= request.item.model %></p>
+        <p>Price: <%= request.item.price %></p>
+        <p>Details: <%= request.item.details %></p>
+        <h3>Requested By: <%= request.requestBy %></h3>
+        <p>Status: <%= request.status %></p>
+      </div>
+    <% }); %>
+  <% } else { %>
+    <p>No pending requests found.</p>
+  <% } %>
+</body>
+</html>

@@ -2,8 +2,21 @@ const express = require('express');
 const dotenv = require('dotenv');
 const colors = require('colors');
 const cors = require('cors');
+const ejs = require('ejs');
+const path=require("path")
+const app=express()
+app.use(express.json());
 
+// Middleware for parsing URL-encoded form data
+app.use(express.urlencoded({ extended: true }));
+app.set('views', path.join(__dirname,"/views"));
+app.use(express.static(path.join(__dirname,"/views")));
+// Set the view engine to use EJS
+app.set('view engine', 'ejs');
 const { connectDB } = require('./config/db');
+const bodyParser = require('body-parser');
+
+app.use(express.json());
 
 const userRoutesV1 = require('./routes/v1/user.route');
 
@@ -16,7 +29,6 @@ const limiter = rateLimit({
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
 
-const app = express();
 
 dotenv.config();
 
@@ -30,7 +42,7 @@ app.use(cors());
 app.options('*', cors());
 
 app.get('/', (req, res) => {
-  res.send('Server is running....');
+  res.render("homepage");
 });
 
 app.use('/api/v1/users/', userRoutesV1);

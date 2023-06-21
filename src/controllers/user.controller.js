@@ -9,6 +9,9 @@ const requestsSchema=require("../models/requests.model")
 dotenv.config()
 var fs = require('fs');
 const path = require('path');
+const express=require("express")
+const app=express()
+app.use(express.json())
 
 module.exports.register = asyncHandler(async (req, res) => {
         try {
@@ -23,8 +26,8 @@ module.exports.register = asyncHandler(async (req, res) => {
           // Create a new user
           const newUser = new userSchema({
             email,
-            password,
-            mobileNumber // Plain password (not hashed)
+            password, 
+            mobileNumber 
           });
       
           // Save the user to the database
@@ -40,7 +43,6 @@ module.exports.register = asyncHandler(async (req, res) => {
 module.exports.login = asyncHandler(async (req, res) => {
         try {
           const { email, password } = req.body;
-      
           // Find the user in the database based on email
           const user = await userSchema.findOne({ email });
           if (!user) {
@@ -55,6 +57,10 @@ module.exports.login = asyncHandler(async (req, res) => {
       
           // Password is valid, generate a JWT token and return it to the client
           const token=jwt.sign({_id:user._id},process.env.JWT_SECRET);
+          res.cookie('authToken', token, {
+            httpOnly: true,
+            secure: true, // Enable this if using HTTPS
+          });
           return res.header("auth-token",token).send({ message : "Login Successful" , token : token})
         } catch (error) {
           console.error('Error logging in:', error);
@@ -220,8 +226,9 @@ module.exports.pendingRentalRecords=asyncHandler(async(req,res)=>{
 module.exports.closeRentalRecord=asyncHandler(async(req,res)=>{
   try {
     const returnProofImage=req.files["returnProofImage"][0].filename
+    const returndedDate=req.body.returndedDate
     const requestId = mongoose.Types.ObjectId(req.params.id);
-    await requestsSchema.updateMany({_id:requestId},{$set:{status:true,returnProofImage:returnProofImage}});
+    await requestsSchema.updateMany({_id:requestId},{$set:{status:true,returnProofImage:returnProofImage,returndedDate:returndedDate}});
     return res.status(200).json({ message: "item return recorded successfully" });
   } catch (error) {
     console.log("error",error)

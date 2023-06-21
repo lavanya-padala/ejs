@@ -32,6 +32,9 @@ const requestsSchema = new Schema({
     returnProofImage:{
         type:String,
         default:""
+    },
+    returnedDate:{
+        type:String,
     }
 })
 module.exports = model('requestsSchema',requestsSchema)

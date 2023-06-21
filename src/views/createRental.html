@@ -1,0 +1,23 @@
+<!-- form.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create Rental Record</title>
+</head>
+<body>
+  <h1>Create Rental Record</h1>
+
+  <form id="recordForm" method="POST" enctype="multipart/form-data">
+    <label for="returnDate">Return Date:</label>
+    <input type="text" id="returnDate" name="returnDate" required>
+
+    <label for="startDate">Start Date:</label>
+    <input type="text" id="startDate" name="startDate" required>
+
+    <label for="proofImage">Proof Image:</label>
+    <input type="file" id="proofImage" name="proofImage" required>
+
+    <button type="submit">Submit</button>
+  </form>
+
+</body>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Items</title>
+  <style>
+    /* Add some basic styling */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>Items</h1>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Brand</th>
+      <th>Model</th>
+      <th>Price</th>
+      <th>Details</th>
+      <th>Owner</th>
+      <th>Created At</th>
+      <th>Updated At</th>
+    </tr>
+    <% items.forEach(item => { %>
+      <tr>
+        <td><%= item._id %></td>
+        <td><%= item.brand %></td>
+        <td><%= item.model %></td>
+        <td><%= item.price %></td>
+        <td><%= item.details %></td>
+        <td><%= item.owner %></td>
+        <td><%= item.createdAt %></td>
+        <td><%= item.updatedAt %></td>
+      </tr>
+    <% }) %>
+  </table>
+</body>
+</html>
